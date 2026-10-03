@@ -1,0 +1,43 @@
+# Generated from openapi.json by bun scripts/generate.mts. Do not edit.
+from ._transport import Route
+
+ROUTES = {
+    "list_inboxes": Route(path="/v1/inboxes", method="GET", path_params=[], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "create_inbox": Route(path="/v1/inboxes", method="POST", path_params=[], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "get_inbox": Route(path="/v1/inboxes/{inbox_id}", method="GET", path_params=["inbox_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "update_inbox": Route(path="/v1/inboxes/{inbox_id}", method="PATCH", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "delete_inbox": Route(path="/v1/inboxes/{inbox_id}", method="DELETE", path_params=["inbox_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+    "get_sending_policy": Route(path="/v1/inboxes/{inbox_id}/sending-policy", method="GET", path_params=["inbox_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "get_receiving_policy": Route(path="/v1/inboxes/{inbox_id}/receiving-policy", method="GET", path_params=["inbox_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "list_messages": Route(path="/v1/inboxes/{inbox_id}/messages", method="GET", path_params=["inbox_id"], query_params=["limit","cursor","query","from","recipient","subject","after","before","labels_all","labels_any","labels_none","order"], body=False, binary=False, success_statuses=[200]),
+    "count_messages": Route(path="/v1/inboxes/{inbox_id}/messages/count", method="GET", path_params=["inbox_id"], query_params=["query","from","recipient","subject","after","before","labels_all","labels_any","labels_none"], body=False, binary=False, success_statuses=[200]),
+    "get_message": Route(path="/v1/messages/{message_id}", method="GET", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "delete_message": Route(path="/v1/messages/{message_id}", method="DELETE", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+    "update_message_labels": Route(path="/v1/messages/{message_id}", method="PATCH", path_params=["message_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "download_raw_message": Route(path="/v1/messages/{message_id}/raw", method="GET", path_params=["message_id"], query_params=[], body=False, binary=True, success_statuses=[200]),
+    "download_attachment": Route(path="/v1/messages/{message_id}/attachments/{attachment_id}", method="GET", path_params=["message_id","attachment_id"], query_params=[], body=False, binary=True, success_statuses=[200]),
+    "delete_sent_message": Route(path="/v1/sent/{message_id}", method="DELETE", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+    "update_sent_message_labels": Route(path="/v1/sent/{message_id}", method="PATCH", path_params=["message_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "get_sent_message": Route(path="/v1/sent/{message_id}", method="GET", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "bulk_update_message_labels": Route(path="/v1/messages/labels", method="PATCH", path_params=[], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "bulk_update_sent_labels": Route(path="/v1/sent/labels", method="PATCH", path_params=[], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "list_labels": Route(path="/v1/inboxes/{inbox_id}/labels", method="GET", path_params=["inbox_id"], query_params=["limit","cursor","prefix"], body=False, binary=False, success_statuses=[200]),
+    "send_message": Route(path="/v1/inboxes/{inbox_id}/sent", method="POST", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "list_sent_messages": Route(path="/v1/inboxes/{inbox_id}/sent", method="GET", path_params=["inbox_id"], query_params=["limit","cursor","query","from","recipient","subject","after","before","labels_all","labels_any","labels_none","order"], body=False, binary=False, success_statuses=[200]),
+    "reply_message": Route(path="/v1/inboxes/{inbox_id}/reply", method="POST", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "reply_all_message": Route(path="/v1/inboxes/{inbox_id}/reply-all", method="POST", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "forward_message": Route(path="/v1/inboxes/{inbox_id}/forward", method="POST", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "get_outbound_quota": Route(path="/v1/outbound/quota", method="GET", path_params=[], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "create_draft": Route(path="/v1/inboxes/{inbox_id}/drafts", method="POST", path_params=["inbox_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "list_drafts": Route(path="/v1/inboxes/{inbox_id}/drafts", method="GET", path_params=["inbox_id"], query_params=["limit","cursor","state"], body=False, binary=False, success_statuses=[200]),
+    "get_draft": Route(path="/v1/drafts/{draft_id}", method="GET", path_params=["draft_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "update_draft": Route(path="/v1/drafts/{draft_id}", method="PATCH", path_params=["draft_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "delete_draft": Route(path="/v1/drafts/{draft_id}", method="DELETE", path_params=["draft_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+    "send_draft": Route(path="/v1/drafts/{draft_id}/send", method="POST", path_params=["draft_id"], query_params=[], body=True, binary=False, success_statuses=[200,201]),
+    "list_threads": Route(path="/v1/inboxes/{inbox_id}/threads", method="GET", path_params=["inbox_id"], query_params=["limit","cursor","query","from","recipient","subject","after","before","labels_all","labels_any","labels_none","order"], body=False, binary=False, success_statuses=[200]),
+    "get_thread": Route(path="/v1/threads/{thread_id}", method="GET", path_params=["thread_id"], query_params=["limit","cursor"], body=False, binary=False, success_statuses=[200]),
+    "update_thread_labels": Route(path="/v1/threads/{thread_id}", method="PATCH", path_params=["thread_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
+    "delete_thread": Route(path="/v1/threads/{thread_id}", method="DELETE", path_params=["thread_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+}
+
+PAGE_FIELDS = {"list_messages":"messages","list_sent_messages":"messages","list_drafts":"drafts","list_labels":"labels","list_threads":"threads","get_thread":"messages"}
