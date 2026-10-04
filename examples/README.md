@@ -2,7 +2,7 @@
 
 Use Python 3.11+ and an existing [human-approved API key](https://cherami.to/docs/quickstart). No MCP connection is required. The scripts operate only when you run them; none starts a background poller.
 
-The package is not published yet. From this SDK checkout, install it and its development environment with `uv sync --locked`. Run the commands below from this directory's parent with `uv run python examples/…`. Applications can install the local distribution with `uv pip install /path/to/cherami-python` in an active virtual environment.
+From this SDK checkout, install it and its development environment with `uv sync --locked`. Run the commands below from this directory's parent with `uv run python examples/…`. Applications can install the published package with `pip install cherami` or `uv add cherami`.
 
 ## Read correspondence
 

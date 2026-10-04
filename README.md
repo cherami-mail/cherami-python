@@ -6,11 +6,16 @@ Python 3.11+, with synchronous and asynchronous clients and typed dictionaries.
 
 ## Install and connect
 
-The package is **not yet published on PyPI**. Clone this repository, then install it in an active virtual environment:
+Install from PyPI:
 
 ```sh
-git clone https://github.com/cherami-mail/cherami-python.git
-uv pip install ./cherami-python
+pip install cherami
+```
+
+Or, with uv:
+
+```sh
+uv add cherami
 ```
 
 [Get an API key](https://cherami.to/docs/quickstart) and set `CHERAMI_API_KEY` in your application's environment. Keep it private: it grants access to all inboxes on your account.
