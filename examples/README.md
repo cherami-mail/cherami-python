@@ -12,7 +12,7 @@ Supply `CHERAMI_API_KEY` privately through your environment.
 uv run python examples/read_inbox.py
 ```
 
-Without `CHERAMI_INBOX_ID`, this lists available inbox IDs and addresses, then stops. Set the ID of the inbox assigned to your application and run again. The example reads one page of 20 messages and prints prepared message text, so run it in a private terminal. It does not label messages.
+Without `CHERAMI_INBOX_ID`, this lists available inbox IDs and addresses, then stops. Set the ID of the inbox assigned to your application and run again. The example reads one page of 20 messages and prints prepared message text. It does not label messages.
 
 For async applications, the equivalent is:
 
@@ -26,23 +26,23 @@ That version requires the inbox ID and prints original plaintext. Both show unfi
 
 Confirm the recipient and reply content before continuing. `reply_message` derives recipients from the source's Reply-To or From; use an explicitly addressed `send_message` intent instead when you need to override them.
 
-Set `CHERAMI_INBOX_ID`, `CHERAMI_MESSAGE_ID` (the Cherami message ID, not an RFC Message-ID), and `CHERAMI_REPLY_TEXT`. Set `CHERAMI_INTENT_PATH` to a new absolute filename in an existing private directory outside your repository.
+Set `CHERAMI_INBOX_ID`, `CHERAMI_MESSAGE_ID` (the Cherami message ID, not an RFC Message-ID), and `CHERAMI_REPLY_TEXT`. Set `CHERAMI_INTENT_PATH` to where the send record is saved, a new file for each intended reply.
 
 ```sh
 uv run python examples/prepare_reply.py
 ```
 
-This saves the payload, original key and preparation time with private permissions and exclusive creation. It sends nothing and requires no API key. Use a separate record for each intended reply, and keep the saved file unchanged for recovery.
+This saves the payload, original key and preparation time. It sends nothing and requires no API key. Keep the saved file unchanged for recovery.
 
 ## Submit or recover that reply
 
-Set `CHERAMI_RECEIPT_DIR` to an existing absolute private directory and retain `CHERAMI_INTENT_PATH` and `CHERAMI_API_KEY`.
+Keep `CHERAMI_INTENT_PATH` and `CHERAMI_API_KEY` set.
 
 ```sh
 uv run python examples/submit_reply.py
 ```
 
-Initial submission and recovery use this same command and original record. Each run makes exactly one request, saving `{data, status, request_id}` in a new private receipt file before printing the message ID, outcome and persistence flag. Preserve every complete receipt.
+Initial submission and recovery use this same command and original record. Each run makes exactly one request and prints the receipt as one JSON line, `{data, status, request_id}`, carrying the message ID, outcome and persistence flag. Preserve every receipt.
 
 `accepted` is provider acceptance, not delivery; `rejected` is explicit provider rejection; `unknown` leaves submission uncertain. If `outcome_persisted` is false, preserve the immediate result even if later reads lag. The helper refuses submission after 23 hours and 59 minutes from preparation; after expiry, inspect sent resources instead.
 

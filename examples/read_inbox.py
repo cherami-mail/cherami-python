@@ -1,4 +1,4 @@
-"""Read recent mail. Prints message text: run privately, not in shared logs."""
+"""Read recent mail and print prepared message text."""
 import os
 from cherami import Cherami
 
@@ -15,4 +15,4 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
             content = detail["content"]
             # Empty extracted text is meaningful; only None falls back to original.
             text = content["reply_text"] if content["reply_text"] is not None else content["text"]
-            print(text if text is not None else "No plain text; inspect original content privately.")
+            print(text if text is not None else "No plain text; inspect original content.")

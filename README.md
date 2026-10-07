@@ -18,7 +18,7 @@ Or, with uv:
 uv add cherami
 ```
 
-[Get an API key](https://cherami.to/docs/quickstart) and set `CHERAMI_API_KEY` in your application's environment. Keep it private: it grants access to all inboxes on your account.
+[Get an API key](https://cherami.to/docs/quickstart) and supply it privately as `CHERAMI_API_KEY` in your application's environment. It grants access to every inbox on the account.
 
 ```python
 import os
@@ -52,7 +52,7 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
             print(detail["id"], detail["processing_status"])
 ```
 
-Content is available when processing is `ready`. Run this example somewhere private because it prints email bodies.
+Content is available when processing is `ready`.
 
 ### Async and pagination
 
@@ -100,7 +100,7 @@ intent = prepare_send("send_message", {
 saved_json = intent.to_json()
 ```
 
-**Persist `saved_json` in your application's database or a private file before submitting.** It contains the message, retry key and preparation time, but not your API key. The [runnable reply examples](examples/README.md#prepare-an-approved-reply) show a complete file-based workflow, including receipt storage.
+**Persist `saved_json` before submitting**, in your application's database or a file. It contains the message, retry key and preparation time, but not your API key. The [runnable reply examples](examples/README.md#prepare-an-approved-reply) show a file-based workflow.
 
 For both initial submission and recovery, load that saved JSON and restore the same intent:
 
@@ -116,7 +116,7 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
         "status": result.status,
         "request_id": result.request_id,
     }
-    # Persist this receipt without replacing earlier receipts for the intent.
+    # Keep this receipt; it does not replace earlier receipts for the intent.
 ```
 
 Read `result.data["message"]["status"]` to distinguish the outcome:
