@@ -20,7 +20,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://cherami.to"
-Documentation = "https://cherami.to/docs/guides/python"
+Documentation = "https://cherami.to/docs/python"
 Repository = "https://github.com/cherami-mail/cherami-python"
 Issues = "https://github.com/cherami-mail/cherami-python/issues"
 
