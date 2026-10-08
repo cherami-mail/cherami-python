@@ -100,7 +100,7 @@ intent = prepare_send("send_message", {
 saved_json = intent.to_json()
 ```
 
-**Persist `saved_json` before submitting**, in your application's database or a file. It contains the message, retry key and preparation time, but not your API key. The [runnable reply examples](examples/README.md#prepare-an-approved-reply) show a file-based workflow.
+**Persist `saved_json` before submitting.** It contains the message, retry key and preparation time. The [runnable reply examples](examples/README.md#prepare-an-approved-reply) show a file-based workflow.
 
 For both initial submission and recovery, load that saved JSON and restore the same intent:
 

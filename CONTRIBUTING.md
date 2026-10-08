@@ -13,7 +13,7 @@ The selected `openapi.json` and `operations.json` are the generation inputs. Dis
 
 Keep transport, serialization, errors, pagination and send-recovery policy shared between sync and async clients. Only HTTPX I/O and iterator syntax differ. Preserve omitted versus null values, original file bytes, request IDs and accepted/rejected/unknown outcomes. No automatic retries or redirects. A broken response or cancellation cannot establish that a write was rolled back.
 
-Use focused manual checks with a substituted HTTPX transport for fault paths. Real requests require an appropriately authorized account and workflow; never send mail or mutate an inbox merely to check an example. Do not commit credentials, mail, recovery records or private operation material. The runnable examples explain private file handling and explicit sending.
+Use focused manual checks with a substituted HTTPX transport for fault paths. Real requests require an appropriately authorized account and workflow; never send mail or mutate an inbox merely to check an example. Do not commit credentials, mail, recovery records or private operation material. The runnable examples show the save-then-submit sequence and explicit sending.
 
 ## Distribution
 
