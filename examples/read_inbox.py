@@ -1,4 +1,4 @@
-"""Read recent mail and print prepared message text."""
+"""Read recent mail and print each ready message's text without quoted history."""
 import os
 from cherami import Cherami
 
@@ -13,6 +13,7 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
         print(detail["id"], detail["processing_status"])
         if detail["processing_status"] == "ready":
             content = detail["content"]
-            # Empty extracted text is meaningful; only None falls back to original.
+            # reply_text leaves out quoted history. Empty means nothing new was written;
+            # fall back to the full text only when it is None (not extracted).
             text = content["reply_text"] if content["reply_text"] is not None else content["text"]
             print(text if text is not None else "No plain text; inspect original content.")

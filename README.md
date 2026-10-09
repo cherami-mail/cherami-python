@@ -1,24 +1,18 @@
 # Cherami Python SDK
 
-The official Python client for [Cherami](https://cherami.to), email infrastructure for AI agents. Create inboxes for ongoing work, read incoming correspondence, and send messages from your application.
+The official Python client for [Cherami](https://cherami.to), email infrastructure for AI agents. Create inboxes for your agents, read the mail that arrives and send from their addresses.
 
 Python 3.11+, with synchronous and asynchronous clients and typed dictionaries.
 
 ## Install and connect
 
-Install from PyPI:
-
 ```sh
 pip install cherami
-```
-
-Or, with uv:
-
-```sh
+# or
 uv add cherami
 ```
 
-[Get an API key](https://cherami.to/docs/quickstart) and supply it privately as `CHERAMI_API_KEY` in your application's environment. It grants access to every inbox on the account.
+[Create an API key](https://cherami.to/docs/quickstart#create-an-api-key) and supply it privately as `CHERAMI_API_KEY`. Then list your inboxes:
 
 ```python
 import os
@@ -29,15 +23,13 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
         print(inbox["id"], inbox["address"])
 ```
 
-Choose an inbox and set `CHERAMI_INBOX_ID` to its ID for the examples below.
+This prints every inbox on your account. Set `CHERAMI_INBOX_ID` to the one you want to work with; the examples below use it. If the list is empty, [create an inbox](https://cherami.to/docs/api/inboxes/create-inbox) with `create_inbox`.
 
-Methods accept dictionaries and return a response envelope. `.data` contains the result; `.status`, `.headers`, and `.request_id` expose HTTP response information. Path and query parameters go at the top level of the input dictionary; JSON request fields go in `body`.
+Methods take a dictionary and return a response envelope: `.data` holds the result, and `.status`, `.headers` and `.request_id` the HTTP details. Path and query parameters go at the top level of the dictionary, and JSON request fields go in `body`. Field names match the HTTP API. Leave out optional fields you don't need, and pass `None` only where the API accepts null.
 
 ## Read mail
 
-For repeated checks, see [webhooks and polling](https://cherami.to/docs/troubleshooting#does-cherami-provide-webhooks) and the [receiving guide](https://cherami.to/docs/guides/receiving). They cover bounded runs, pagination, unfinished content and handled-message tracking.
-
-List messages, then fetch their content:
+List recent messages, then fetch each one. Its content is available once `processing_status` is `ready`:
 
 ```python
 with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
@@ -52,11 +44,11 @@ with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
             print(detail["id"], detail["processing_status"])
 ```
 
-Content is available when processing is `ready`.
+To act on mail as it arrives, [add a webhook](https://cherami.to/docs/guides/webhooks), or poll as [Receive and poll for mail](https://cherami.to/docs/guides/receiving) describes.
 
 ### Async and pagination
 
-`AsyncCherami` has the same methods and response types. Use `iterate` to read across pages without managing cursors yourself:
+`AsyncCherami` has the same methods and response types. `iterate` reads across pages without you managing cursors:
 
 ```python
 import asyncio
@@ -76,15 +68,13 @@ async def main():
 asyncio.run(main())
 ```
 
-In an existing event loop, use `await main()`. Sync clients support the same iterator with ordinary `for`. `iterate` yields items; `pages` yields response envelopes. Both fetch lazily. Set `max_pages` to bound requests; otherwise they follow all pages.
+The sync client iterates the same way with a plain `for`. `iterate` yields items and `pages` yields response envelopes; both fetch only as you consume them. Set `max_pages` to cap requests; otherwise they follow every page.
 
-Context managers close connections. For a long-lived client, call `close()` or `await aclose()` when your application shuts down.
+For a long-lived client outside a `with` block, call `close()`, or `await aclose()`, when your application shuts down.
 
 ## Send and recover
 
-The SDK makes no automatic retries. Its send helper separates preparing a message from submitting it so your application can save the original request before sending and, if the response is lost, recover with the same retry key instead of sending twice.
-
-Replace the example recipient, then prepare the message:
+Prepare each email once and save the record before you submit it.
 
 ```python
 from cherami import prepare_send
@@ -97,77 +87,67 @@ intent = prepare_send("send_message", {
         "text": "The change is ready for review.",
     },
 })
-saved_json = intent.to_json()
+record = intent.to_json()
+# Save record here.
 ```
 
-**Persist `saved_json` before submitting.** It contains the message, retry key and preparation time. The [runnable reply examples](examples/README.md#prepare-an-approved-reply) show a file-based workflow.
-
-For both initial submission and recovery, load that saved JSON and restore the same intent:
+Submit the saved record:
 
 ```python
 from cherami import restore_send
 
-# saved_json must come from the record persisted before the first submission.
-saved = restore_send(saved_json)
+saved = restore_send(record)  # the record you saved
 with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
-    result = client.submit(saved)
-    receipt = {
-        "data": result.data,
-        "status": result.status,
-        "request_id": result.request_id,
-    }
-    # Keep this receipt; it does not replace earlier receipts for the intent.
+    receipt = client.submit(saved).data
+print(receipt["message"]["id"], receipt["message"]["status"], receipt["outcome_persisted"])
 ```
 
-Read `result.data["message"]["status"]` to distinguish the outcome:
+If `submit` raises `CheramiTransportError`, the response was lost: submit the same saved record again. It carries the original retry key, so we return the first attempt instead of sending a second email.
+
+`receipt["message"]["status"]` tells you what happened:
 
 | Outcome | Meaning |
 | --- | --- |
-| `accepted` | The provider accepted submission. This is not proof of delivery. |
-| `rejected` | The provider explicitly rejected submission. |
-| `unknown` | Submission may have succeeded. Recover using the saved intent. |
+| `accepted` | The email provider accepted the message. This does not confirm delivery. |
+| `rejected` | The provider refused it, and `receipt["message"]["error_code"]` says why. Fix that and prepare a new record to send it again. |
+| `unknown` | We couldn't confirm whether it went out. Preparing it again could send a duplicate. |
 
-These outcomes are data, not exceptions. Preserve every returned receipt: when `outcome_persisted` is false, it may contain an outcome that later reads do not yet show.
+All three arrive as data, not exceptions. If `outcome_persisted` is false, keep this receipt: later reads may not show its outcome.
 
-The helper refuses submission after **23 hours and 59 minutes from preparation**. After expiry, inspect sent resources instead.
+`submit` accepts a record for **23 hours and 59 minutes after preparation**, then raises `SendRecoveryExpiredError`. After that, check `list_sent_messages`: if the email isn't there, prepare it again.
 
-The helper also supports `reply_message`, `reply_all_message`, and `forward_message`. Direct send methods leave retry-key and recovery-window management to your application. Drafts use `send_draft` with separate same-draft protection. See the [sending guide](https://cherami.to/docs/guides/sending) and [draft guide](https://cherami.to/docs/guides/drafts) for those workflows.
+`prepare_send` also takes `reply_message`, `reply_all_message` and `forward_message`. If you call those methods or `send_message` directly, supply your own `idempotency_key` and save the request before sending: resending it unchanged within 24 hours returns the first attempt instead of sending again. Drafts send with `send_draft` and recover by sending the same draft ID again. See the [sending guide](https://cherami.to/docs/guides/sending) and [draft guide](https://cherami.to/docs/guides/drafts) for those workflows.
 
 ## Handle errors
 
 ```python
-from cherami import CheramiApiError, CheramiTransportError
+from cherami import CheramiApiError
 
 with Cherami(os.environ["CHERAMI_API_KEY"]) as client:
     try:
         inboxes = client.list_inboxes().data
     except CheramiApiError as error:
         print(error.status, error.code, error.request_id)
-    except CheramiTransportError:
-        # No usable API response was received.
-        raise
 ```
 
-API errors also expose `.body`, `.headers`, and `.retry_after`. Transport failures raise `CheramiTransportError`; for a write, the request may still have completed, so use the saved-intent workflow above for sends.
+API errors also expose `.body`, `.headers` and `.retry_after`. `CheramiTransportError` means no usable response arrived; for a send, submit the same saved record again.
 
-Clients use HTTPX with a default 60-second inactivity timeout per network operation. Pass `timeout` to a client or method to change it, or `None` to disable it. Requests do not automatically retry or follow redirects.
+Each network operation times out after 60 seconds of inactivity by default. Pass `timeout` to a client or method to change it, or `None` to disable it. The client never retries a request or follows a redirect.
 
 ## More workflows
 
-The SDK supports inboxes, received and sent mail, replies, forwarding, drafts, labels, conversations, policy inspection and attachment downloads.
+The SDK also covers sent mail, replies, forwarding, drafts, labels, conversations, Trash and restore, policy inspection and attachment downloads.
 
-- [Runnable examples](examples/README.md): read mail, prepare a reply, and submit or recover it.
-- [Python guide](https://cherami.to/docs/python): client configuration, attachments and download handling.
-- [HTTP reference](https://cherami.to/docs/api): input fields and response contracts. Named Python types are available from `cherami.models`, including `SendInput`, `SendReceipt`, and operation types such as `ListMessagesParams`.
+- [Runnable examples](https://github.com/cherami-mail/cherami-python/blob/main/examples/README.md): read mail, prepare a reply, and submit or recover it.
+- [Python guide](https://cherami.to/docs/python): client configuration, attachments and downloads.
+- [HTTP reference](https://cherami.to/docs/api): every operation's fields and responses.
 
-Inputs and results are ordinary dictionaries with HTTP field names unchanged. Omit optional fields unless you intend to supply them; use `None` only where the API permits null. Types support static checking, not runtime validation.
+Named types such as `SendInput`, `SendReceipt` and `ListMessagesParams` are in `cherami.models` for type checking.
+
+For help, [contact support](https://cherami.to/support).
 
 ## Development
 
-```sh
-uv sync --locked
-bun scripts/generate.mts
-uv build
-```
+You don't need Bun or the model generator to use the package. See [CONTRIBUTING.md](https://github.com/cherami-mail/cherami-python/blob/main/CONTRIBUTING.md) for generation and distribution details.
 
-Consumers need neither Bun nor the model generator. See [CONTRIBUTING.md](CONTRIBUTING.md) for generation and distribution details. MIT licensed.
+MIT licensed.

@@ -352,18 +352,21 @@ class SendDraft(TypedDict):
     idempotency_key: NotRequired[str]
 
 
-class ThreadSummary(TypedDict):
+class ThreadLatestMessage1(TypedDict):
     id: str
-    inbox_id: str
-    subject: str | None
-    last_activity_at: str
-    message_count: int
-    received_count: int
-    accepted_count: int
-    rejected_count: int
-    unknown_count: int
-    matching_message_ids: NotRequired[list[str]]
-    matching_message_count: NotRequired[int]
+    direction: Literal['received']
+    counterpart: ParsedAddress | None
+    preview: Preview | None
+
+
+class ThreadLatestMessage2(TypedDict):
+    id: str
+    direction: Literal['sent']
+    counterpart: Mailbox | None
+    preview: Preview | None
+
+
+ThreadLatestMessage: TypeAlias = ThreadLatestMessage1 | ThreadLatestMessage2
 
 
 class ThreadReceivedDetail2(TypedDict):
@@ -447,6 +450,42 @@ class DeletedThread(TypedDict):
     received_count: int
     sent_count: int
     status: Literal['deletion_pending']
+    message: str
+
+
+TrashEntry1 = TypedDict(
+    'TrashEntry1',
+    {
+        'id': str,
+        'kind': Literal['received'],
+        'inbox_id': str,
+        'subject': str | None,
+        'from': ParsedAddress | None,
+        'envelope_from': str,
+        'deleted_at': str,
+        'restorable_until': str,
+    },
+)
+
+
+class TrashEntry2(TypedDict):
+    id: str
+    kind: Literal['sent']
+    inbox_id: str
+    subject: str | None
+    to: list[Mailbox]
+    deleted_at: str
+    restorable_until: str
+
+
+TrashEntry: TypeAlias = TrashEntry1 | TrashEntry2
+
+
+class Restored(TypedDict):
+    id: str
+    inbox_id: str
+    thread_id: str | None
+    status: Literal['restored', 'already_live']
     message: str
 
 
@@ -867,14 +906,6 @@ ListThreadsParams = TypedDict(
 )
 
 
-class ListThreadsResult(TypedDict):
-    threads: list[ThreadSummary]
-    next_cursor: str | None
-
-
-ListThreadsItem: TypeAlias = ThreadSummary
-
-
 class GetThreadParams(TypedDict):
     thread_id: str
     limit: NotRequired[int]
@@ -894,6 +925,34 @@ class DeleteThreadParams(TypedDict):
 
 
 DeleteThreadResult: TypeAlias = DeletedThread
+
+
+class ListTrashParams(TypedDict):
+    inbox_id: str
+    limit: NotRequired[int]
+    cursor: NotRequired[str]
+
+
+class ListTrashResult(TypedDict):
+    messages: list[TrashEntry]
+    next_cursor: str | None
+
+
+ListTrashItem: TypeAlias = TrashEntry
+
+
+class RestoreMessageParams(TypedDict):
+    message_id: str
+
+
+RestoreMessageResult: TypeAlias = Restored
+
+
+class RestoreSentMessageParams(TypedDict):
+    message_id: str
+
+
+RestoreSentMessageResult: TypeAlias = Restored
 
 
 class InboxList(TypedDict):
@@ -1007,6 +1066,21 @@ DraftDetail = TypedDict(
 )
 
 
+class ThreadSummary(TypedDict):
+    id: str
+    inbox_id: str
+    subject: str | None
+    last_activity_at: str
+    message_count: int
+    received_count: int
+    accepted_count: int
+    rejected_count: int
+    unknown_count: int
+    latest_message: ThreadLatestMessage
+    matching_message_ids: NotRequired[list[str]]
+    matching_message_count: NotRequired[int]
+
+
 class ThreadReceivedDetail1(TypedDict):
     id: str
     inbox_id: str
@@ -1047,6 +1121,14 @@ class SendMessageParams(TypedDict):
 
 
 GetDraftResult: TypeAlias = DraftDetail
+
+
+class ListThreadsResult(TypedDict):
+    threads: list[ThreadSummary]
+    next_cursor: str | None
+
+
+ListThreadsItem: TypeAlias = ThreadSummary
 
 
 GetThreadItem: TypeAlias = ThreadReceivedDetail | ThreadSentDetail

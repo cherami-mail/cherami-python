@@ -1,18 +1,16 @@
 # Run the examples
 
-Use Python 3.11+ and an existing [API key](https://cherami.to/docs/quickstart#create-an-api-key). The scripts operate only when you run them; none starts a background poller.
+These scripts read an inbox, then prepare and send a reply, using Python 3.11+. From this SDK checkout, run `uv sync --locked`, then run the commands below from the checkout root.
 
-From this SDK checkout, install it and its development environment with `uv sync --locked`. Run the commands below from this directory's parent with `uv run python examples/…`. Applications can install the published package with `pip install cherami` or `uv add cherami`.
+[Create an API key](https://cherami.to/docs/quickstart#create-an-api-key) and supply it privately as `CHERAMI_API_KEY`.
 
-## Read correspondence
-
-Supply `CHERAMI_API_KEY` privately through your environment.
+## Read an inbox
 
 ```sh
 uv run python examples/read_inbox.py
 ```
 
-Without `CHERAMI_INBOX_ID`, this lists available inbox IDs and addresses, then stops. Set the ID of the inbox assigned to your application and run again. The example reads one page of 20 messages and prints prepared message text. It does not label messages.
+Without `CHERAMI_INBOX_ID`, it lists your inboxes and stops; set the ID of the one you want and run it again. It reads one page of 20 messages and prints each one's text without quoted history, or its processing status if it is not ready yet. It only reads.
 
 For async applications, the equivalent is:
 
@@ -20,30 +18,28 @@ For async applications, the equivalent is:
 uv run python examples/read_inbox_async.py
 ```
 
-That version requires the inbox ID and prints original plaintext. Both show unfinished message preparation as its processing status.
+This version needs `CHERAMI_INBOX_ID` and prints each message's full text.
 
-## Prepare an approved reply
+## Prepare a reply
 
-Confirm the recipient and reply content before continuing. `reply_message` derives recipients from the source's Reply-To or From; use an explicitly addressed `send_message` intent instead when you need to override them.
+Pick a message ID from the read output. The reply goes to that message's Reply-To address, or its From when there is none; to choose recipients yourself, prepare with `send_message` instead, as the [README](../README.md#send-and-recover) shows.
 
-Set `CHERAMI_INBOX_ID`, `CHERAMI_MESSAGE_ID` (the Cherami message ID, not an RFC Message-ID), and `CHERAMI_REPLY_TEXT`. Set `CHERAMI_INTENT_PATH` to where the send record is saved, a new file for each intended reply.
+Set `CHERAMI_INBOX_ID`, `CHERAMI_MESSAGE_ID` and `CHERAMI_REPLY_TEXT`, and set `CHERAMI_INTENT_PATH` to the file to save the reply's send record to.
 
 ```sh
 uv run python examples/prepare_reply.py
 ```
 
-This saves the payload, original key and preparation time. It sends nothing and requires no API key. Keep the saved file unchanged for recovery.
+This saves the reply, its retry key and preparation time to that file. It sends nothing and needs no API key.
 
-## Submit or recover that reply
+## Submit or recover the reply
 
-Keep `CHERAMI_INTENT_PATH` and `CHERAMI_API_KEY` set.
+With the same `CHERAMI_INTENT_PATH`, run the script below. **It sends the reply.**
 
 ```sh
 uv run python examples/submit_reply.py
 ```
 
-Initial submission and recovery use this same command and original record. Each run makes exactly one request and prints the receipt as one JSON line, `{data, status, request_id}`, carrying the message ID, outcome and persistence flag. Preserve every receipt.
+It prints the receipt as one JSON line, `{data, status, request_id}`. If it fails with `CheramiTransportError`, run **submit** again with the same file, not prepare: we return the original attempt instead of sending twice. After 23 hours and 59 minutes from preparation, submit refuses the record; check sent mail, and if the reply isn't there, prepare it again.
 
-`accepted` is provider acceptance, not delivery; `rejected` is explicit provider rejection; `unknown` leaves submission uncertain. If `outcome_persisted` is false, preserve the immediate result even if later reads lag. The helper refuses submission after 23 hours and 59 minutes from preparation; after expiry, inspect sent resources instead.
-
-See the [sending guide](https://cherami.to/docs/guides/sending) for the complete contract.
+Read the outcome in `data.message.status` and `data.outcome_persisted` as the [README](../README.md#send-and-recover) explains.

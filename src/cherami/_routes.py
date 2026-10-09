@@ -38,6 +38,9 @@ ROUTES = {
     "get_thread": Route(path="/v1/threads/{thread_id}", method="GET", path_params=["thread_id"], query_params=["limit","cursor"], body=False, binary=False, success_statuses=[200]),
     "update_thread_labels": Route(path="/v1/threads/{thread_id}", method="PATCH", path_params=["thread_id"], query_params=[], body=True, binary=False, success_statuses=[200]),
     "delete_thread": Route(path="/v1/threads/{thread_id}", method="DELETE", path_params=["thread_id"], query_params=[], body=False, binary=False, success_statuses=[202]),
+    "list_trash": Route(path="/v1/inboxes/{inbox_id}/trash", method="GET", path_params=["inbox_id"], query_params=["limit","cursor"], body=False, binary=False, success_statuses=[200]),
+    "restore_message": Route(path="/v1/messages/{message_id}/restore", method="POST", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
+    "restore_sent_message": Route(path="/v1/sent/{message_id}/restore", method="POST", path_params=["message_id"], query_params=[], body=False, binary=False, success_statuses=[200]),
 }
 
-PAGE_FIELDS = {"list_messages":"messages","list_sent_messages":"messages","list_drafts":"drafts","list_labels":"labels","list_threads":"threads","get_thread":"messages"}
+PAGE_FIELDS = {"list_messages":"messages","list_sent_messages":"messages","list_drafts":"drafts","list_labels":"labels","list_threads":"threads","get_thread":"messages","list_trash":"messages"}

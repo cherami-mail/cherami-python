@@ -101,7 +101,7 @@ class Cherami(SyncClient):
         return self._request(ROUTES["reply_message"], params, timeout=timeout)
 
     def reply_all_message(self, params: models.ReplyAllMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ReplyAllMessageResult]:
-        """Reply to visible participants. See the HTTP reference for state/recovery semantics."""
+        """Reply to all. See the HTTP reference for state/recovery semantics."""
         return self._request(ROUTES["reply_all_message"], params, timeout=timeout)
 
     def forward_message(self, params: models.ForwardMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ForwardMessageResult]:
@@ -152,6 +152,18 @@ class Cherami(SyncClient):
         """Delete a conversation. See the HTTP reference for state/recovery semantics."""
         return self._request(ROUTES["delete_thread"], params, timeout=timeout)
 
+    def list_trash(self, params: models.ListTrashParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ListTrashResult]:
+        """List Trash. See the HTTP reference for state/recovery semantics."""
+        return self._request(ROUTES["list_trash"], params, timeout=timeout)
+
+    def restore_message(self, params: models.RestoreMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.RestoreMessageResult]:
+        """Restore a received message. See the HTTP reference for state/recovery semantics."""
+        return self._request(ROUTES["restore_message"], params, timeout=timeout)
+
+    def restore_sent_message(self, params: models.RestoreSentMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.RestoreSentMessageResult]:
+        """Restore a sent copy. See the HTTP reference for state/recovery semantics."""
+        return self._request(ROUTES["restore_sent_message"], params, timeout=timeout)
+
     @overload
     def pages(self, operation: Literal["list_messages"], params: models.ListMessagesParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[ApiResponse[models.ListMessagesResult]]: ...
 
@@ -169,6 +181,9 @@ class Cherami(SyncClient):
 
     @overload
     def pages(self, operation: Literal["get_thread"], params: models.GetThreadParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[ApiResponse[models.GetThreadResult]]: ...
+
+    @overload
+    def pages(self, operation: Literal["list_trash"], params: models.ListTrashParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[ApiResponse[models.ListTrashResult]]: ...
 
     def pages(self, operation: str, params: Any, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[ApiResponse[Any]]:
         return self._pages(operation, params, max_pages=max_pages, timeout=timeout)
@@ -190,6 +205,9 @@ class Cherami(SyncClient):
 
     @overload
     def iterate(self, operation: Literal["get_thread"], params: models.GetThreadParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[models.GetThreadItem]: ...
+
+    @overload
+    def iterate(self, operation: Literal["list_trash"], params: models.ListTrashParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[models.ListTrashItem]: ...
 
     def iterate(self, operation: str, params: Any, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> Iterator[Any]:
         return self._iterate(operation, params, max_pages=max_pages, timeout=timeout)
@@ -289,7 +307,7 @@ class AsyncCherami(AsyncClient):
         return await self._request(ROUTES["reply_message"], params, timeout=timeout)
 
     async def reply_all_message(self, params: models.ReplyAllMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ReplyAllMessageResult]:
-        """Reply to visible participants. See the HTTP reference for state/recovery semantics."""
+        """Reply to all. See the HTTP reference for state/recovery semantics."""
         return await self._request(ROUTES["reply_all_message"], params, timeout=timeout)
 
     async def forward_message(self, params: models.ForwardMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ForwardMessageResult]:
@@ -340,6 +358,18 @@ class AsyncCherami(AsyncClient):
         """Delete a conversation. See the HTTP reference for state/recovery semantics."""
         return await self._request(ROUTES["delete_thread"], params, timeout=timeout)
 
+    async def list_trash(self, params: models.ListTrashParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.ListTrashResult]:
+        """List Trash. See the HTTP reference for state/recovery semantics."""
+        return await self._request(ROUTES["list_trash"], params, timeout=timeout)
+
+    async def restore_message(self, params: models.RestoreMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.RestoreMessageResult]:
+        """Restore a received message. See the HTTP reference for state/recovery semantics."""
+        return await self._request(ROUTES["restore_message"], params, timeout=timeout)
+
+    async def restore_sent_message(self, params: models.RestoreSentMessageParams, *, timeout: Timeout = DEFAULT_TIMEOUT) -> ApiResponse[models.RestoreSentMessageResult]:
+        """Restore a sent copy. See the HTTP reference for state/recovery semantics."""
+        return await self._request(ROUTES["restore_sent_message"], params, timeout=timeout)
+
     @overload
     def pages(self, operation: Literal["list_messages"], params: models.ListMessagesParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[ApiResponse[models.ListMessagesResult]]: ...
 
@@ -357,6 +387,9 @@ class AsyncCherami(AsyncClient):
 
     @overload
     def pages(self, operation: Literal["get_thread"], params: models.GetThreadParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[ApiResponse[models.GetThreadResult]]: ...
+
+    @overload
+    def pages(self, operation: Literal["list_trash"], params: models.ListTrashParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[ApiResponse[models.ListTrashResult]]: ...
 
     def pages(self, operation: str, params: Any, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[ApiResponse[Any]]:
         return self._pages(operation, params, max_pages=max_pages, timeout=timeout)
@@ -378,6 +411,9 @@ class AsyncCherami(AsyncClient):
 
     @overload
     def iterate(self, operation: Literal["get_thread"], params: models.GetThreadParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[models.GetThreadItem]: ...
+
+    @overload
+    def iterate(self, operation: Literal["list_trash"], params: models.ListTrashParams, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[models.ListTrashItem]: ...
 
     def iterate(self, operation: str, params: Any, *, max_pages: int | None = None, timeout: Timeout = DEFAULT_TIMEOUT) -> AsyncIterator[Any]:
         return self._iterate(operation, params, max_pages=max_pages, timeout=timeout)

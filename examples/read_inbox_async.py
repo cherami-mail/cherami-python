@@ -1,4 +1,4 @@
-"""Async reading uses the same models and lazy pagination, without blocking I/O."""
+"""Read recent mail with the async client and print each ready message's text."""
 import asyncio
 import os
 from cherami import AsyncCherami

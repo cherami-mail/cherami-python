@@ -1,4 +1,4 @@
-"""Save an approved reply once. No network request or credential is needed."""
+"""Save a reply's send record to CHERAMI_INTENT_PATH without sending it. Run once per reply."""
 import os
 from pathlib import Path
 from cherami import prepare_send

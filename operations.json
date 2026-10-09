@@ -34,5 +34,8 @@
   "listThreads",
   "getThread",
   "updateThreadLabels",
-  "deleteThread"
+  "deleteThread",
+  "listTrash",
+  "restoreMessage",
+  "restoreSentMessage"
 ]

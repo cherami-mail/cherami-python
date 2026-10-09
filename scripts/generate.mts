@@ -18,7 +18,7 @@ if (found.size !== selected.length) throw new Error("Missing selected operations
 const models = structuredClone(spec);
 const descriptors: Record<string, any> = {};
 const methods: string[][] = [[], []];
-const pageFields: Record<string, string> = { listMessages: "messages", listSentMessages: "messages", listDrafts: "drafts", listLabels: "labels", listThreads: "threads", getThread: "messages" };
+const pageFields: Record<string, string> = { listMessages: "messages", listSentMessages: "messages", listDrafts: "drafts", listLabels: "labels", listThreads: "threads", getThread: "messages", listTrash: "messages" };
 const pages: string[][] = [[], []];
 const items: string[][] = [[], []];
 function resolve(s: any): any { return s.$ref ? resolve(spec.components.schemas[s.$ref.split("/").at(-1)]) : s; }
